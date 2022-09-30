@@ -51,6 +51,12 @@ ruleTester.run("memo", rule, {
       parserOptions: { ecmaVersion: 6, sourceType: "module" },
       code: `export default function() { return <div /> };`,
     },
+    {
+      code: `const Component = React.useMemo(() => <div />)`,
+    },
+    {
+      code: `const Component = useMemo(() => <div />)`,
+    },
   ],
   invalid: [
     {

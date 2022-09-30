@@ -14,11 +14,14 @@ function isMemoCallExpression(node: Rule.Node) {
       object.type === "Identifier" &&
       property.type === "Identifier" &&
       object.name === "React" &&
-      property.name === "memo"
+      (property.name === "memo" || property.name === "useMemo")
     ) {
       return true;
     }
-  } else if (node.callee.type === "Identifier" && node.callee.name === "memo") {
+  } else if (
+    node.callee.type === "Identifier" &&
+    (node.callee.name === "memo" || node.callee.name === "useMemo")
+  ) {
     return true;
   }
 
