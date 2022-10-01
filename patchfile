@@ -1,0 +1,38 @@
+diff --git a/__tests__/require-memo.ts b/__tests__/require-memo.ts
+index c360228..fc80d0d 100644
+--- a/__tests__/require-memo.ts
++++ b/__tests__/require-memo.ts
+@@ -51,6 +51,12 @@ ruleTester.run("memo", rule, {
+       parserOptions: { ecmaVersion: 6, sourceType: "module" },
+       code: `export default function() { return <div /> };`,
+     },
++    {
++      code: `const Component = React.useMemo(() => <div />)`,
++    },
++    {
++      code: `const Component = useMemo(() => <div />)`,
++    },
+   ],
+   invalid: [
+     {
+diff --git a/require-memo.ts b/require-memo.ts
+index 8209011..2007219 100644
+--- a/require-memo.ts
++++ b/require-memo.ts
+@@ -14,11 +14,14 @@ function isMemoCallExpression(node: Rule.Node) {
+       object.type === "Identifier" &&
+       property.type === "Identifier" &&
+       object.name === "React" &&
+-      property.name === "memo"
++      (property.name === "memo" || property.name === "useMemo")
+     ) {
+       return true;
+     }
+-  } else if (node.callee.type === "Identifier" && node.callee.name === "memo") {
++  } else if (
++    node.callee.type === "Identifier" &&
++    (node.callee.name === "memo" || node.callee.name === "useMemo")
++  ) {
+     return true;
+   }
+ 
