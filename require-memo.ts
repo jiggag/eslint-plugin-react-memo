@@ -4,7 +4,13 @@ import * as path from "path";
 
 const componentNameRegex = /^[^a-z]/;
 
-function isMemoCallExpression(node: Rule.Node) {
+type Options = { skip?: string[] }[];
+
+function checkSkipOptions(name: string, options: Options) {
+  return options.findIndex(({ skip = [] }) => skip.findIndex(value => value === name) > -1) > -1;
+}
+
+function isMemoCallExpression(node: Rule.Node, options: Options) {
   if (node.type !== "CallExpression") return false;
   if (node.callee.type === "MemberExpression") {
     const {
@@ -14,13 +20,13 @@ function isMemoCallExpression(node: Rule.Node) {
       object.type === "Identifier" &&
       property.type === "Identifier" &&
       object.name === "React" &&
-      (property.name === "memo" || property.name === "useMemo")
+      (property.name === "memo" || checkSkipOptions(property.name, options))
     ) {
       return true;
     }
   } else if (
     node.callee.type === "Identifier" &&
-    (node.callee.name === "memo" || node.callee.name === "useMemo")
+    (node.callee.name === "memo" || checkSkipOptions(node.callee.name, options))
   ) {
     return true;
   }
@@ -39,7 +45,7 @@ function checkFunction(
 ) {
   let currentNode = node.parent;
   while (currentNode.type === "CallExpression") {
-    if (isMemoCallExpression(currentNode)) {
+    if (isMemoCallExpression(currentNode, context.options)) {
       return;
     }
 

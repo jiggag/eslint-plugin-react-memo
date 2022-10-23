@@ -53,12 +53,28 @@ ruleTester.run("memo", rule, {
     },
     {
       code: `const Component = React.useMemo(() => <div />)`,
+      options: [{skip: ['useMemo']}],
     },
     {
       code: `const Component = useMemo(() => <div />)`,
+      options: [{skip: ['useMemo']}],
+    },
+    {
+      code: `const C = memoRef(() => <div />)`,
+      options: [2, {skip: ['memoRef']}],
     },
   ],
   invalid: [
+    {
+      code: `const Component = useMemo(() => <div />)`,
+      options: [2],
+      errors: [{ messageId: "memo-required" }],
+    },
+    {
+      code: `const C = memoRef(() => <div />)`,
+      options: [2],
+      errors: [{ messageId: "memo-required" }],
+    },
     {
       code: `const Component = () => <div />`,
       errors: [{ messageId: "memo-required" }],
